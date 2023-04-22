@@ -32,7 +32,7 @@ function render() {
     // If win
     if(golds.length == 0) {
         clearInterval(interval);
-        ctx.font = '96px JetBrains Mono';
+        ctx.font = '112px Consolas';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText("CLEAR", width * 0.5, height * 0.5);
@@ -65,7 +65,7 @@ function drawFinger() {
 }
 
 function displayScore() {
-    ctx.font = '32px JetBrains Mono';
+    ctx.font = '32px Consolas';
     // ctx.textAlign = 'center';
     ctx.fillText("Score:" + Score, width * 0.02, height * 0.05);
 }
