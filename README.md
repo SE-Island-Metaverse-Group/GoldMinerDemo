@@ -4,7 +4,7 @@
 
 Simple Gold-Miner HTML5 game, preparing for the metaverse project on SE course.
 
-Desing by JelawatIHPC.
+Designed by JelawatIHPC.
 
 ### How to play online
 
