@@ -6,13 +6,14 @@ var Finger = {
     headY: 0,
     t: 0,
     state: 0,
+    minRopeLength: 0,
     maxRopeLength: 0,
     held: -1
 };
 
 const DEGREE = Math.PI / 180;
 const FINGER_VELOCITY = 0.01;   // Ratio
-const FINGER_ANGULAR_VELOCITY = 3.0;
+const FINGER_ANGULAR_VELOCITY = 2.5;
 const FINGER_STATUS = {
     IDLING: 1,
     STRECTCHING: 2,
@@ -39,9 +40,14 @@ function fingerRopeLength() {
 
 function fingerInit(x, y, maxRopeLength) {
     Finger.x = x, Finger.y = y;
-    Finger.headX = x, Finger.headY = y;
+    Finger.minRopeLength = maxRopeLength * 0.05;
     Finger.maxRopeLength = maxRopeLength;
     Finger.state = FINGER_STATUS.IDLING;
+    // Initialize finger direction
+    Finger.t = 0;
+    let direction = fingerDirection();
+    Finger.headX = Finger.x + direction.x * Finger.minRopeLength;
+    Finger.headY = Finger.y + direction.y * Finger.minRopeLength;
 }
 
 function fingerStrectch() {
@@ -52,16 +58,24 @@ function fingerStrectch() {
 
 function fingerUpdate() {
     // Update with status
+
+    let direction = fingerDirection();
+
     switch (Finger.state) {
+
         case FINGER_STATUS.IDLING:
-            ++Finger.t; break;
+            ++Finger.t;
+            direction = fingerDirection();
+            Finger.headX = Finger.x + direction.x * Finger.minRopeLength;
+            Finger.headY = Finger.y + direction.y * Finger.minRopeLength;
+            break;
+
         case FINGER_STATUS.STRECTCHING:
             if (fingerRopeLength() < Finger.maxRopeLength) {
-                let direction = fingerDirection();
+                // Move finger
                 Finger.headX += direction.x * FINGER_VELOCITY * Finger.maxRopeLength;
                 Finger.headY += direction.y * FINGER_VELOCITY * Finger.maxRopeLength;
-
-                // Find gold
+                // Check gold hitbox
                 for(let i = 0; i < golds.length; ++i) {
                     if(golds[i].hitbox.isInside(Finger.headX, Finger.headY)) {
                         // Get you!
@@ -71,26 +85,29 @@ function fingerUpdate() {
                     }
                 }
             } else {
-                let direction = fingerDirection();
+                // Go back and hold nothing
                 Finger.headX = Finger.x + direction.x * Finger.maxRopeLength;
                 Finger.headY = Finger.y + direction.y * Finger.maxRopeLength;
                 Finger.state = FINGER_STATUS.PULLING;
             }
             break;
+
         case FINGER_STATUS.PULLING:
-            if (fingerRopeLength() > FINGER_VELOCITY * Finger.maxRopeLength) {
-                let direction = fingerDirection();
+            if (fingerRopeLength() > Finger.minRopeLength) {
+                // Move finger
                 Finger.headX -= direction.x * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength;
                 Finger.headY -= direction.y * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength;
+                // If finger holds a gold, move gold
                 if(Finger.held > -1) {
                     golds[Finger.held].move(-direction.x * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength, 
                                             -direction.y * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength);
                 }
             } else {
-                let direction = fingerDirection();
-                Finger.headX = Finger.x;
-                Finger.headY = Finger.y;
+                // Recover
+                Finger.headX = Finger.x + direction.x * Finger.minRopeLength;
+                Finger.headY = Finger.y + direction.y * Finger.minRopeLength;
                 Finger.state = FINGER_STATUS.IDLING;
+                // If finger holds a gold, release it and exchange for score
                 if(Finger.held > -1) {
                     Score += golds[Finger.held].value;
                     golds.splice(Finger.held, 1);
@@ -98,6 +115,7 @@ function fingerUpdate() {
                 }
             }
             break;
+
         default:
             // ERROR!
     }
