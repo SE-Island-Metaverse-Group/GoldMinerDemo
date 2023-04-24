@@ -8,8 +8,8 @@ class Gold {
         this.value = value;
         this.rotate = rotate;
         // Hitbox is smaller than gold image
-        this.hitbox = new Hitbox(this.x + this.scale * 0.1, this.y + this.scale * 0.1,
-                                 this.scale * 0.8, this.scale * 0.8);
+        this.hitbox = new Hitbox(this.x + this.scale * 0.15, this.y + this.scale * 0.15,
+                                 this.scale * 0.7, this.scale * 0.7);
     }
 
     move(dx, dy) {
@@ -27,12 +27,12 @@ function generateGold(rangeX, rangeY, rangeW, rangeH, number) {
     // Scale ratio: depending on game area
     const GOLD_SCALE_RATIO = Math.sqrt(0.018 * rangeW * rangeH) / 36;
     // Value ratio
-    const GOLD_VALUE_RATIO = 8;
-    const GOLD_VALUE_BASE = 30;
+    const GOLD_VALUE_RATIO = 8.0;
+    const GOLD_VALUE_BASE = 30.0;
 
     for(let i = 0; i < number; ++i) {
         // Scale & Value
-        base = Math.floor(Math.random() * 37 + 18);
+        base = Math.floor(Math.random() * 37.0 + 18.0);
         scale = Math.floor(base * GOLD_SCALE_RATIO);
         value = Math.floor(base * GOLD_VALUE_RATIO + Math.random() * GOLD_VALUE_BASE);
         // Place gold on map
@@ -49,7 +49,7 @@ function generateGold(rangeX, rangeY, rangeW, rangeH, number) {
                 }
             }
         } while(invalid_pos);
-        ret.push(new Gold(x, y, scale, value, Math.random() * Math.PI * 2));
+        ret.push(new Gold(x, y, scale, value, Math.random() * Math.PI * 2.0));
     }
     return ret;
 }
