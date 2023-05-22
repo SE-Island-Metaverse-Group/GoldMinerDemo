@@ -12,7 +12,8 @@ var Finger = {
 };
 
 const DEGREE = Math.PI / 180;
-const FINGER_VELOCITY = 0.01;   // Ratio
+const FINGER_VELOCITY = 0.01;           // Ratio
+const FINGER_VELOCITY_SPEEDUP = 0.018;  // Pulling gold ratio
 const FINGER_ANGULAR_VELOCITY = 2.5;
 const FINGER_STATUS = {
     IDLING: 1,
@@ -95,12 +96,12 @@ function fingerUpdate() {
         case FINGER_STATUS.PULLING:
             if (fingerRopeLength() > Finger.minRopeLength) {
                 // Move finger
-                Finger.headX -= direction.x * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength;
-                Finger.headY -= direction.y * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength;
+                Finger.headX -= direction.x * FINGER_VELOCITY_SPEEDUP * Finger.maxRopeLength;
+                Finger.headY -= direction.y * FINGER_VELOCITY_SPEEDUP * Finger.maxRopeLength;
                 // If finger holds a gold, move gold
                 if(Finger.held > -1) {
-                    golds[Finger.held].move(-direction.x * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength, 
-                                            -direction.y * FINGER_VELOCITY * 1.8 * Finger.maxRopeLength);
+                    golds[Finger.held].move(-direction.x * FINGER_VELOCITY_SPEEDUP * Finger.maxRopeLength, 
+                                            -direction.y * FINGER_VELOCITY_SPEEDUP * Finger.maxRopeLength);
                 }
             } else {
                 // Recover

@@ -1,19 +1,24 @@
 var ctx = document.getElementById('gold').getContext('2d');
+var maxLoadProgress = 0;
 
-// ======== < Load Resource > ========
+function registerImageResource(imagePath, onLoadCallback) {
+    let img = new Image();
+    img.src = imagePath;
+    img.onload = onLoadCallback;
+    ++maxLoadProgress;
+    return img;
+}
+
+// ======== < Load Static Resource > ========
 
 var loadProgress = 0;
-const MAX_LOAD_PROGRESS = 3;
 
-var bg = new Image();
-bg.src = "Pic/bg.png"
-bg.onload = function() { ++loadProgress; }
-var goldImg = new Image();
-goldImg.src = "Pic/Au.png";
-goldImg.onload = function() { ++loadProgress; }
-var fingerImg = new Image();
-fingerImg.src = "Pic/finger.png";
-fingerImg.onload = function() { ++loadProgress; }
+var increaseProgress = function() { ++loadProgress; }
+var bg = registerImageResource("Pic/bg.png", increaseProgress);
+var goldImg = registerImageResource("Pic/Au.png", increaseProgress);
+var fingerImg = registerImageResource("Pic/finger.png", increaseProgress);
+
+// ======== < Timer Settings > ========
 
 // Progress interval
 var progressInterval;
@@ -23,9 +28,12 @@ var renderInterval;
 var updateInterval;
 // Clear all interval
 function clearAllInterval() {
+    clearInterval(progressInterval);
     clearInterval(renderInterval);
     clearInterval(updateInterval);
 }
+
+// ============ < G A M E > ============
 
 // Window
 var width = window.innerWidth;
@@ -49,13 +57,7 @@ function render() {
     displayScore();
     // If win
     if(golds.length == 0) {
-        clearAllInterval()
-        ctx.font = Math.floor(0.2 * height) + 'px Consolas';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = "#FFEA61";
-        ctx.fillText("CLEAR", width * 0.5, height * 0.5);
-        setTimeout(startGame, 2000);
+        win();
     }
 }
 
@@ -66,13 +68,17 @@ function drawBackground() {
 function drawGold() {
     for(let i = 0; i < golds.length; ++i) {
         // Rotate
-        ctx.translate(golds[i].x + 0.5 * golds[i].scale, golds[i].y + 0.5 * golds[i].scale);
+        ctx.translate(golds[i].x, golds[i].y);
         ctx.rotate(golds[i].rotate);
         // Draw
         ctx.drawImage(goldImg, -0.5 * golds[i].scale, -0.5 * golds[i].scale, golds[i].scale, golds[i].scale);
         // Recover
         ctx.rotate(-golds[i].rotate);
-        ctx.translate(-golds[i].x - 0.5 * golds[i].scale, -golds[i].y - 0.5 * golds[i].scale);
+        ctx.translate(-golds[i].x, -golds[i].y);
+        // Draw Hitbox
+        // ctx.beginPath()
+        // ctx.arc(golds[i].hitbox.x, golds[i].hitbox.y, golds[i].hitbox.r, 0, 2*Math.PI)
+        // ctx.fill()
     }
 }
 
@@ -101,11 +107,26 @@ function displayScore() {
 function startGame() {
     clearAllInterval()
     fingerInit(width * 0.5, height * 0.15, distance(width * 0.5, height * 0.15, width, height) * 0.9);
-    golds = generateGold(0, height * 0.2, width, height * 0.8, GOLD_NUM);
+    golds = generateGold(0, height * 0.25, width, height * 0.75, GOLD_NUM);
     renderInterval = setInterval(render, 30);
     updateInterval = setInterval(fingerUpdate, 30);
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
+}
+
+function win() {
+    // Win
+    clearAllInterval()
+    // Draw "CLEAR"
+    ctx.font = Math.floor(0.2 * height) + 'px Consolas';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = "#FFEA61";
+    ctx.fillText("CLEAR", width * 0.5, height * 0.5);
+    // Draw Score
+    ctx.font = Math.floor(0.1 * height) + 'px Consolas';
+    ctx.fillText("Score:" + Score, width * 0.5, height * 0.65);
+    setTimeout(startGame, 2000);
 }
 
 // Get start
@@ -118,11 +139,11 @@ progressInterval = setInterval(function() {
     ctx.fillStyle = "#7E5709";
     ctx.fillRect(width * 0.32, height * 0.46, width * 0.36, height * 0.08);
     ctx.fillStyle = "#FFEA61";
+    // Use Math.max to avoid draw a rect with negative width.
     ctx.fillRect(width * 0.32 + MARGIN, height * 0.46 + MARGIN,
-                 width * 0.36 * (loadProgress / MAX_LOAD_PROGRESS) - MARGIN * 2, height * 0.08 - MARGIN * 2);
+                 Math.max(0, width * 0.36 * (loadProgress / maxLoadProgress) - MARGIN * 2), height * 0.08 - MARGIN * 2);
     ctx.stroke();
-    if (loadProgress >= MAX_LOAD_PROGRESS) {
-        clearInterval(progressInterval);
+    if (loadProgress >= maxLoadProgress) {
         startGame();
     }
 }, 30);
