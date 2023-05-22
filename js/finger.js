@@ -8,13 +8,14 @@ var Finger = {
     state: 0,
     minRopeLength: 0,
     maxRopeLength: 0,
-    held: -1
+    held: -1,
+    score: 0
 };
 
 const DEGREE = Math.PI / 180;
-const FINGER_VELOCITY = 0.01;           // Ratio
-const FINGER_VELOCITY_SPEEDUP = 0.018;  // Pulling gold ratio
-const FINGER_ANGULAR_VELOCITY = 2.5;
+const FINGER_VELOCITY = 0.011;          // Ratio
+const FINGER_VELOCITY_SPEEDUP = 0.02;   // Pulling gold ratio
+const FINGER_ANGULAR_VELOCITY = 1.75;
 const FINGER_STATUS = {
     IDLING: 1,
     STRECTCHING: 2,
@@ -110,7 +111,7 @@ function fingerUpdate() {
                 Finger.state = FINGER_STATUS.IDLING;
                 // If finger holds a gold, release it and exchange for score
                 if(Finger.held > -1) {
-                    Score += golds[Finger.held].value;
+                    Finger.score += golds[Finger.held].value;
                     golds.splice(Finger.held, 1);
                     Finger.held = -1;
                 }

@@ -62,27 +62,35 @@ class Gold {
     }
 }
 
+function F1(x) {
+    return 3 * Math.pow(x, 2) - 2 * Math.pow(x, 3);
+}
+
+function F2(x) {
+    return 6 * Math.pow(x, 5) - 15 * Math.pow(x, 4) + 10 * Math.pow(x, 3);
+}
+
 function generateGold(rangeX, rangeY, rangeW, rangeH, number) {
     let ret = [];
     let base, scale, value;
     let x, y, invalid_pos;
     let hbox;
     // Scale ratio: depending on game area
-    const GOLD_SCALE_RATIO = Math.sqrt(0.018 * rangeW * rangeH) / 36;
+    const GOLD_SCALE_RATIO = Math.sqrt(0.018 * rangeW * rangeH) / 30;
     // Value ratio
     const GOLD_VALUE_RATIO = 8.0;
     const GOLD_VALUE_BASE = 30.0;
 
     for(let i = 0; i < number; ++i) {
         // Scale & Value
-        base = Math.floor(Math.random() * 37.0 + 18.0);
+        base = Math.floor(Math.random() * 44.0 + 27.0);
         scale = Math.floor(base * GOLD_SCALE_RATIO);
         value = Math.floor(base * GOLD_VALUE_RATIO + Math.random() * GOLD_VALUE_BASE);
         // Place gold on map
         do {
             invalid_pos = false;
-            x = Math.random() * (rangeW-scale) + rangeX;
-            y = Math.random() * (rangeH-scale) + rangeY;
+            x = F1(Math.random()) * (rangeW - scale) + rangeX;
+            y = Math.random() * (rangeH - scale) + rangeY;
             hbox = GoldHitbox(x, y, scale);     // Hitbox of this gold
             // Check overlap region
             for(let j = 0; j < ret.length; ++j) {

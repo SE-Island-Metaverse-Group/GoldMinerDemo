@@ -14,11 +14,11 @@ function registerImageResource(imagePath, onLoadCallback) {
 var loadProgress = 0;
 
 var increaseProgress = function() { ++loadProgress; }
-var bg = registerImageResource("Pic/bg.png", increaseProgress);
-var goldImg = registerImageResource("Pic/Au.png", increaseProgress);
-var fingerImg = registerImageResource("Pic/finger.png", increaseProgress);
+var bg = registerImageResource("res/textures/bg.png", increaseProgress);
+var goldImg = registerImageResource("res/textures/Au.png", increaseProgress);
+var fingerImg = registerImageResource("res/textures/finger.png", increaseProgress);
 
-// ======== < Timer Settings > ========
+// ======== < Interval Settings > ========
 
 // Progress interval
 var progressInterval;
@@ -36,17 +36,16 @@ function clearAllInterval() {
 // ============ < G A M E > ============
 
 // Window
-var width = window.innerWidth;
-var height = window.innerHeight - 50;
+var width = window.innerWidth - 15;
+var height = window.innerHeight - 15;
 document.getElementById('gold').setAttribute('width', width);
 document.getElementById('gold').setAttribute('height', height);
 
 // Golds
-const GOLD_NUM = 12;
+const GOLD_NUM = 6;
 var golds = [];
 
 // Game
-var Score;
 const FINGER_RENDER_SIZE = Math.floor(Math.sqrt(0.00164 * width * height));
 
 function render() {
@@ -99,15 +98,17 @@ function drawFinger() {
 }
 
 function displayScore() {
-    ctx.font = Math.floor(0.05 * height) + 'px Consolas';
+    ctx.font = Math.floor(0.05 * height) + 'px Ubuntu';
     ctx.fillStyle = "#7E5709";
-    ctx.fillText("Score:" + Score, width * 0.02, height * 0.05);
+    ctx.fillText("Score:" + Finger.score, width * 0.02, height * 0.05);
+    ctx.font = Math.floor(0.025 * height) + 'px Ubuntu';
+    ctx.fillText("userid: " + userid, width * 0.02, height * 0.085);
 }
 
 function startGame() {
     clearAllInterval()
     fingerInit(width * 0.5, height * 0.15, distance(width * 0.5, height * 0.15, width, height) * 0.9);
-    golds = generateGold(0, height * 0.25, width, height * 0.75, GOLD_NUM);
+    golds = generateGold(width * 0.05, height * 0.3, width * 0.90, height * 0.7, GOLD_NUM);
     renderInterval = setInterval(render, 30);
     updateInterval = setInterval(fingerUpdate, 30);
     ctx.textAlign = 'left';
@@ -118,19 +119,19 @@ function win() {
     // Win
     clearAllInterval()
     // Draw "CLEAR"
-    ctx.font = Math.floor(0.2 * height) + 'px Consolas';
+    ctx.font = Math.floor(0.2 * height) + 'px Ubuntu';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = "#FFEA61";
     ctx.fillText("CLEAR", width * 0.5, height * 0.5);
     // Draw Score
-    ctx.font = Math.floor(0.1 * height) + 'px Consolas';
-    ctx.fillText("Score:" + Score, width * 0.5, height * 0.65);
+    ctx.font = Math.floor(0.1 * height) + 'px Ubuntu';
+    ctx.fillText("Score:" + Finger.score, width * 0.5, height * 0.65);
     setTimeout(startGame, 2000);
 }
 
 // Get start
-Score = 0;
+Finger.score = 0;
 // Loading ...
 progressInterval = setInterval(function() {
     const MARGIN = 3;
